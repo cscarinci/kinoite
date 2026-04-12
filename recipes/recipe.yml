@@ -1,45 +1,121 @@
 ---
 # yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
-# image will be published to ghcr.io/<user>/<name>
+
 name: kinoite
-# description will be included in the image's metadata
 description: This is my personal OS image.
+base-image: ghcr.io/ublue-os/kinoite-main
+image-version: 43
 
-# the base image to build on top of (FROM) and the version tag to use
-base-image: ghcr.io/ublue-os/silverblue-main
-image-version: 42 # latest is also supported if you want new updates ASAP
-
-# module configuration, executed in order
-# you can include multiple instances of the same module
 modules:
+  # ── Custom Files ──────────────────────────────────────────────
+  # Overlay files from system/ onto the root filesystem.
+  # Used for: flatpak overrides, profile.d scripts, etc.
   - type: files
     files:
       - source: system
-        destination: / # copies files/system/* (* means everything inside it) into your image's root folder /
+        destination: /
 
+  # ── System Packages ───────────────────────────────────────────
   - type: dnf
     repos:
       copr:
-        - atim/starship
+        - toroidalfox/kime
     install:
       packages:
-        - micro
-        - starship
+        # Input method
+        - kime-git
+
+        # Editors
+        - emacs                # runs as user daemon (see systemd below)
+        - neovim
+
+        # Document viewer
+        - zathura
+        - zathura-pdf-mupdf
+
+        # Modern CLI replacements
+        - alacritty
+        - eza                  # ls
+        - zoxide               # cd
+        - btop                 # top/htop
+        - bat                  # cat
+        - ripgrep              # grep
+        - fd-find              # find
+        - git-delta            # git diff
+        - trash-cli            # rm → trash
+        - fastfetch            # system info
+
+        # Theming
+        - papirus-icon-theme
+
+        # Utilities
+        - stow                 # dotfile management
+        - p7zip                # archive extraction
+
+        # Services & tools
+        - tailscale            # mesh VPN (daemon enabled below)
+        - gh                   # GitHub CLI
+
     remove:
       packages:
-        # example: removing firefox (in favor of the flatpak)
-        # "firefox" is the main package, "firefox-langpacks" is a dependency
-        - firefox
-        - firefox-langpacks # also remove firefox dependency (not required for all packages, this is a special case)
+        - firefox              # replaced by Zen Browser (flatpak)
+        - firefox-langpacks
 
+  # ── Flatpaks ──────────────────────────────────────────────────
   - type: default-flatpaks
     configurations:
-      - notify: true # Send notification after install/uninstall is finished (true/false)
+      - notify: true
         scope: system
-        # If no repo information is specified, Flathub will be used by default
-        install: # system flatpaks we want all users to have and not remove
-          - org.mozilla.firefox
-          - org.gnome.Loupe
-      - scope: user # Also add Flathub user repo, but no user packages
+        install:
+          # Browser
+          - app.zen_browser.zen
 
-  - type: signing # this sets up the proper policy & signing files for signed images to work fully
+          # Communication
+          - eu.betterbird.Betterbird
+          - me.proton.Mail
+
+          # Media & productivity
+          - com.spotify.Client
+          - org.libreoffice.LibreOffice
+
+          # Security & networking
+          - com.bitwarden.desktop
+          - com.protonvpn.www
+          - org.fkoehler.KTailctl       # Tailscale GUI
+
+          # Sync & system tools
+          - com.github.zocker_160.SyncThingy
+          - org.fedoraproject.MediaWriter
+          - com.github.tchx84.Flatseal  # flatpak permission manager
+      - scope: user
+
+  # ── Fonts ─────────────────────────────────────────────────────
+  - type: fonts
+    fonts:
+      nerd-fonts:
+        - FiraCode
+        - Hack
+        - SourceCodePro
+        - JetBrainsMono
+        - NerdFontsSymbolsOnly
+      google-fonts:
+        - Roboto
+        - NotoSansKorean
+
+  # ── Systemd Services ─────────────────────────────────────────
+  - type: systemd
+    system:
+      enabled:
+        - tailscaled.service   # Tailscale VPN daemon (requires root)
+    user:
+      enabled:
+        - emacs.service        # emacs daemon; connect via emacsclient
+
+  # ── Custom Scripts ───────────────────────────────────────────
+  - type: script
+    scripts:
+      - pkgs.sh
+      - dirs.sh
+
+  # ── Image Signing ─────────────────────────────────────────────
+  - type: signing

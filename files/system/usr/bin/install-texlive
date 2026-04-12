@@ -1,0 +1,88 @@
+#!/bin/bash
+set -euo pipefail
+
+ARCH=$(uname -m)
+case "$ARCH" in
+  x86_64) TLARCH="x86_64-linux" ;;
+  aarch64|arm64) TLARCH="aarch64-linux" ;;
+  *) echo "Unsupported architecture: $ARCH"; exit 1 ;;
+esac
+
+TEXBASE="$HOME/.texlive"
+
+# check for existing install
+if [ -d "$TEXBASE" ]; then
+    EXISTING=$(find "$TEXBASE" -maxdepth 4 -type f -path "*/bin/$TLARCH/tex" 2>/dev/null | sort -r | head -1)
+    if [ -n "$EXISTING" ]; then
+        echo "TeX Live already installed: $EXISTING"
+        echo "Run 'tlmgr update --all' to update."
+        exit 0
+    fi
+fi
+
+WORKDIR=$(mktemp -d)
+trap 'rm -rf "$WORKDIR"' EXIT
+cd "$WORKDIR"
+
+echo "Downloading TeX Live installer..."
+curl -LO --retry 5 --retry-delay 5 \
+  https://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz
+
+tar xzf install-tl-unx.tar.gz
+cd install-tl-*/
+
+# extract year safely
+TLYEAR=$(basename "$PWD" | sed -E 's/.*install-tl-([0-9]{4}).*/\1/')
+
+TEXDIR="$TEXBASE/$TLYEAR"
+TEXBIN="$TEXDIR/bin/$TLARCH"
+
+echo "Installing TeX Live $TLYEAR (scheme-minimal) — this may take a while..."
+perl install-tl \
+    --texdir="$TEXDIR" \
+    --scheme=minimal \
+    --no-interaction
+
+export PATH="$TEXBIN:$PATH"
+
+echo "Configuring tlmgr repository..."
+tlmgr option repository https://mirror.ctan.org/systems/texlive/tlnet
+
+tlmgr conf texmf TEXMFHOME "$TEXBASE/texmf"
+
+echo "Installing a few basic packages..."
+tlmgr install \
+  texliveonfly \
+  latexmk \
+  xetex \
+  fontspec \
+  unicode-math \
+  collection-latexrecommended \
+  biblatex \
+  biber
+
+mkdir -p "$HOME/.config/environment.d"
+cat > "$HOME/.config/environment.d/texlive.conf" <<EOF
+PATH=$TEXBIN:$PATH
+EOF
+
+cat << EOF
+
+TeX Live $TLYEAR installed successfully.
+
+  Restart your shell or run:
+    export PATH="$TEXBIN:\$PATH"
+
+  Compile with auto-install of missing packages:
+    texliveonfly document.tex
+
+  With latexmk:
+    texliveonfly --compiler=latexmk --arguments="-pdf" document.tex
+
+  Normal compilation:
+    latexmk -pdf document.tex
+
+  Update everything:
+    tlmgr update --all
+
+EOF

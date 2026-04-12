@@ -29,6 +29,9 @@ modules:
         - emacs                # runs as user daemon (see systemd below)
         - neovim
 
+        # LaTeX dependencies
+        - perl-Unicode-Normalize
+
         # Document viewer
         - zathura
         - zathura-pdf-mupdf

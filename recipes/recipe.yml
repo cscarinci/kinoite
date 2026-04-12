@@ -53,6 +53,7 @@ modules:
         # Utilities
         - stow                 # dotfile management
         - p7zip                # archive extraction
+	- powertop
 
         # Services & tools
         - tailscale            # mesh VPN (daemon enabled below)

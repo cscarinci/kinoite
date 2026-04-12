@@ -116,7 +116,6 @@ modules:
   # ── Custom Scripts ───────────────────────────────────────────
   - type: script
     scripts:
-      - pkgs.sh
       - dirs.sh
 
   # ── Image Signing ─────────────────────────────────────────────

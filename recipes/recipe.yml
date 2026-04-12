@@ -93,7 +93,8 @@ modules:
           - com.github.zocker_160.SyncThingy
           - org.fedoraproject.MediaWriter
           - com.github.tchx84.Flatseal  # flatpak permission manager
-      - scope: user
+      - notify: false 
+        scope: user
 
   # ── Fonts ─────────────────────────────────────────────────────
   - type: fonts

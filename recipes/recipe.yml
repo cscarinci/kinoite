@@ -33,7 +33,7 @@ modules:
         - zathura
         - zathura-pdf-mupdf
 
-	# Terminal
+        # Terminal
         - alacritty
 	
         # Modern CLI replacements

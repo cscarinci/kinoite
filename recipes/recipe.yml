@@ -35,7 +35,7 @@ modules:
 
         # Terminal
         - alacritty
-	
+
         # Modern CLI replacements
         - eza                  # ls
         - zoxide               # cd

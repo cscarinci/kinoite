@@ -33,8 +33,10 @@ modules:
         - zathura
         - zathura-pdf-mupdf
 
-        # Modern CLI replacements
+	# Terminal
         - alacritty
+	
+        # Modern CLI replacements
         - eza                  # ls
         - zoxide               # cd
         - btop                 # top/htop

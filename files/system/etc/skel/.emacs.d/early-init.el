@@ -33,7 +33,7 @@
 
 (add-hook 'emacs-startup-hook #'global-display-line-numbers-mode)
 ;; (add-to-list 'default-frame-alist '(font . "Fira Code-13"))
-(add-to-list 'default-frame-alist '(font . "Hack-13"))
+;; (add-to-list 'default-frame-alist '(font . "Hack-13"))
 ;; (add-to-list 'default-frame-alist '(undecorated . t))
 
 (setq backup-directory-alist '(("." . "~/.emacs.d/backups/")))

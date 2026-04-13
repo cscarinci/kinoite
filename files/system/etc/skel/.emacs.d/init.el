@@ -299,3 +299,9 @@
   (corfu-prescient-enable-filtering nil)
   :config
   (corfu-prescient-mode 1))
+
+
+(use-package cs-tex
+  :load-path "~/.emacs.d/")
+
+

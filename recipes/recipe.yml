@@ -67,6 +67,11 @@ modules:
         - firefox              # replaced by Zen Browser (flatpak)
         - firefox-langpacks
 
+  # ── Brew ──────────────────────────────────────────────────────
+  - type: brew
+    nofile-limits: true # increase nofile limits
+    brew-analytics: false # disable telemetry
+    
   # ── Flatpaks ──────────────────────────────────────────────────
   - type: default-flatpaks
     configurations:

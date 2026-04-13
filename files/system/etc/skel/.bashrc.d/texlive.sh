@@ -1,0 +1,1 @@
+PATH=$HOME/.texlive/2026/bin/x86_64-linux:$PATH

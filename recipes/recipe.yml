@@ -57,6 +57,8 @@ modules:
         - stow                 # dotfile management
         - p7zip                # archive extraction
         - powertop
+        - mu
+        - isync
 
         # Services & tools
         - tailscale            # mesh VPN (daemon enabled below)

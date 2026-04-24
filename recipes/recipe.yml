@@ -57,7 +57,7 @@ modules:
         - stow                 # dotfile management
         - p7zip                # archive extraction
         - powertop
-        - mu
+        - maildir-utils
         - isync
 
         # Services & tools

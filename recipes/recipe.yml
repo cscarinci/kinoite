@@ -34,7 +34,7 @@ modules:
 
         # Document viewer
         - zathura
-        - zathura-pdf-mupdf
+        - zathura-pdf-poppler
 
         # Terminal
         - alacritty
